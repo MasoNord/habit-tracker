@@ -1,14 +1,15 @@
 import datetime
+import logging
 from typing import List
 
 from fastapi import HTTPException
-from datetime import date
 from habit_tracker.dto import ResponseMessage
 from habit_tracker.modules.habits.dto import CreateHabitRequest, HabitResponse, UpdateHabitRequest, HabitFilters
 from habit_tracker.modules.habits.models import Habits, HabitCompletion
 from habit_tracker.modules.habits.repos import HabitsRepo, HabitLogsRepo, HabitCompletionRepo
 from habit_tracker.users.models import Users
 
+log = logging.getLogger(__name__)
 
 class HabitsServices:
     def __init__(
@@ -31,6 +32,7 @@ class HabitsServices:
             days_to_log=request_data.days_to_log,
             logs_to_complete=request_data.logs_to_complete,
             title=request_data.title,
+            current_streak=0,
             description=request_data.description,
             type=request_data.type.value,
             icon_url=request_data.icon_url,
@@ -45,7 +47,9 @@ class HabitsServices:
         habits = await self.__habits_repo.get_all(user.id)
 
         response = []
-
+        log.info(f"Fetching all habits for user: {user.id}")
+        log.info(f"Filter tab: {filters.tab}")
+        log.info(f"Current day: {current_day}")
         for h in habits:
             current_date = datetime.date.today()
             habit_current_log = await self.__habit_logs_repo.count_habit_logs(h.id, current_date)
@@ -58,6 +62,8 @@ class HabitsServices:
                     response.append(r)
             elif filters.tab == "all":
                 response.append(r)
+
+        log.info(f"All habits are fetched for user")
 
         return response
 
@@ -103,7 +109,7 @@ class HabitsServices:
             await self.__habit_completion_repo.save(habit_complete)
 
             current_streak = habit.current_streak
-            if not current_streak:
+            if current_streak == 0:
                 current_streak = 1
             else:
                 current_streak += 1

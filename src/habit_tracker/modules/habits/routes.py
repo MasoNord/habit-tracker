@@ -1,4 +1,4 @@
-from datetime import date
+import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends
@@ -32,14 +32,11 @@ async def get_user_habits(
     auth_service: AuthService = Depends(get_auth_service),
     habits_service: HabitsServices = Depends(get_habit_service)
 ):
-
-    today = date.today()
-
-    current_day_of_month = today.day
+    today_number = datetime.date.today().weekday()
 
     user = await auth_service.get_current_user(request)
 
-    return await habits_service.get_all(user, current_day_of_month, filters)
+    return await habits_service.get_all(user, today_number, filters)
 
 @habits_router.put("/{habit_id:int}", response_model=HabitResponse, status_code=HTTP_200_OK)
 async def update_habit(

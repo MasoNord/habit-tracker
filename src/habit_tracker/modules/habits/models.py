@@ -1,6 +1,5 @@
 import datetime
 from typing import List
-
 from sqlalchemy import Integer, String, ForeignKey, UniqueConstraint, Date, text
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import mapped_column, Mapped, relationship

@@ -21,6 +21,7 @@ class HabitResponse(BaseModel):
     id: int
     description: Optional[str] = None
     current_logs: Optional[int] = 0
+    current_streak: Optional[int] = 0
     title: str
     color: str
     days_to_log: list[int]
