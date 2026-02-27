@@ -1,0 +1,1 @@
+from habit_tracker.db.base import Base
